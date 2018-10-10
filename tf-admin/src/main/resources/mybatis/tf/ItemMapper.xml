@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hpe.tf.dao.ItemMapper">
+	<resultMap type="com.hpe.tf.dto.ItemDto" id="itemFindResult">
+		<id property="itemId" column="item_id"/>
+		<result property="categoryId" column="category_id"/>
+		<result property="itemTitle" column="item_title"/>
+		<result property="itemImg" column="item_img"/>
+		<result property="itemDesc" column="item_desc"/>
+		<result property="price" column="price"/>
+		<result property="sales" column="sales"/>
+		<result property="createTime" column="create_time"/>
+		<result property="disabled" column="disabled"/>
+		<result property="isRecommend" column="is_recommend"/>
+		<association property="category" javaType="category">
+			<id property="categoryId" column="category_id"/>
+			<result property="pId" column="p_id"/>
+			<result property="categoryName" column="category_name"/>
+			<result property="categoryPath" column="category_path"/>
+			<result property="level" column="level"/>
+			<result property="createTime" column="create_time"/>
+		</association>
+		
+	</resultMap>
+	<select id="findItem" resultMap="itemFindResult" parameterType="com.hpe.tf.entity.Item">
+		select i.*,c.*
+		from item i INNER JOIN category c on i.category_id=c.category_id
+		<where>
+			<if test="itemTitle!=null and itemTitle!=''">
+			and	i.item_title like #{itemTitle} 
+			</if>
+			<if test="categoryId!=null and categoryId!=0">
+				and	 i.category_id =#{categoryId}
+			</if>
+		</where>
+	</select>
+	<delete id="deleteItemByIds" parameterType="int">
+		delete from item where item_id in
+		<foreach collection="array" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>
